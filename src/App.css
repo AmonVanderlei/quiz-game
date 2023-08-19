@@ -1,38 +1,103 @@
-.App {
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #a9a9a9;
+}
+
+header {
+  background-color: #007acc;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+header h1 {
+  margin: 0;
+}
+
+main {
+  width: 80%;
+  max-width: 800px;
+  margin: 5% auto 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+#question-container {
+  margin-bottom: 20px;
+}
+
+#question {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  padding: 10px 0;
+}
+
+#options {
+  list-style: none;
+  padding: 0;
+}
+
+#options li {
+  margin-bottom: 10px;
+}
+
+button {
+  display: block;
+  width: 100%;
+  height: 3rem;
+  padding: 10px;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #005bb5;
+}
+
+#result-container, #score-container {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#result-container.hidden, #score-container.hidden, #ended.hidden{
+  display: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#result-text {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+#score {
+  font-size: 24px;
+  font-weight: bold;
+  color: #007acc;
+}
+
+#ended {
+  position: absolute;
+  width: 85%;
+  height: 75%;
+  margin: auto;
+  padding: 10px 25px;
+  top: 13%;
+  left: 5%;
+  border-radius: 25px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  justify-content: space-around;
+  color: #007acc;
+  background-color: #fff;
+  font-size: 1.5rem;
 }
