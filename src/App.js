@@ -1,11 +1,14 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 function App() {
   const [name, setName] = useState("Quiz Game")
   const [questions, setQuestions] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [questionsAnswered, setQuestionsAnswered] = useState([]);
+  const [options, setOptions] = useState([["Opção 1", 0], ["Opção 2", 1], ["Opção 3", 2], ["Opção 4", 3]]);
   const [score, setScore] = useState(0);
+  const [resultText, setResultText] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [quizEnded, setQuizEnded] = useState(false);
 
@@ -27,55 +30,107 @@ function App() {
   "O verdadeiro campeão é aquele que não desiste!",
   "Missão cumprida! Todas as perguntas respondidas."]
 
+  function getRandomNumber(n) {
+    return Math.floor(Math.random() * n);
+  }
+
+  const setRandomIndex = useCallback(() => {
+    let random = getRandomNumber(questions.length)
+    while (questionsAnswered.includes(random)) {
+      random = getRandomNumber(questions.length)
+    }
+    setQuestionIndex(random);
+  }, [questions, questionsAnswered]);
+
+  const setAlternatives = useCallback(() => {
+    let newQuestions = [-1, -1, -1, -1];
+    let addedQuestions = [questionIndex]
+    let availableIndexes = [true, true, true, true]
+
+    let i = getRandomNumber(4)
+    newQuestions[i] = [questions[questionIndex].referencia, i]
+    availableIndexes[i] = false
+
+    for (let j = 0; j < availableIndexes.length; j++) {
+      if (availableIndexes[j]) {
+        let randomIndex = getRandomNumber(questions.length)
+        while (addedQuestions.includes(randomIndex)) {
+          randomIndex = getRandomNumber(questions.length);
+        }
+        newQuestions[j] = [questions[randomIndex].referencia, j]
+        availableIndexes[j] = false
+      }
+    }
+    setOptions(newQuestions);
+  }, [questions, questionIndex]);
+
+  const checkAnswer = (selectedAnswer) => {
+    if (!showResult) {
+      const currentQuestion = questions[questionIndex];
+      let resultText = '';
+  
+      if (selectedAnswer === currentQuestion.referencia) {
+        setScore(score + 1);
+        resultText = correctMessages[getRandomNumber(correctMessages.length)];
+      } else {
+        resultText = wrongMessages[getRandomNumber(wrongMessages.length)];
+      }
+  
+      if ((questionsAnswered.length + 1) === questions.length) {
+        setQuizEnded(true);
+      } else {
+        setShowResult(true);
+      }
+  
+      setResultText(resultText);
+    }
+  };
+  
+
+  const nextQuestion = () => {
+    if (questionsAnswered.length === questions.length) {
+      setQuizEnded(true);
+    } else {
+      setQuestionsAnswered([...questionsAnswered, questionIndex]);
+      setShowResult(false);
+    }
+  };
+
+  const restartQuiz = () => {
+    setRandomIndex();
+    setQuestionsAnswered([])
+    setScore(0);
+    setShowResult(false);
+    setQuizEnded(false);
+  };
+
   useEffect(() => {
-    fetch('escrituras.json')
+    fetch('http://localhost:8000/')
       .then((response) => response.json())
       .then((jsonData) => {
-        setName(jsonData.livros[0].nome)
-        setQuestions(jsonData.livros[0].novo_testamento);
+        if (jsonData.livros && jsonData.livros[0] && jsonData.livros[0].novo_testamento) {
+          setName(jsonData.livros[0].nome);
+          setQuestions(jsonData.livros[0].novo_testamento);
+        } else {
+          console.error('A estrutura dos dados está incorreta');
+        }
       })
       .catch((error) => {
         console.error('Erro ao carregar o JSON:', error);
       });
   }, []);
-
-  function getRandomNumber(n) {
-    return Math.floor(Math.random() * n);
-  }
-
-  const checkAnswer = (selectedIndex) => {
-    if (!showResult) {
-      const currentQuestion = questions[questionIndex];
-      if (currentQuestion.opcoes[selectedIndex][1]) {
-        setScore(score + 1);
-        document.getElementById('result-text').textContent = correctMessages[getRandomNumber(correctMessages.length)];
-      } else {
-        document.getElementById('result-text').textContent = wrongMessages[getRandomNumber(wrongMessages.length)];
-      }
-
-      if (questionIndex === questions.length - 1) {
-        setQuizEnded(true);
-      } else {
-        setShowResult(true);
-      }
+  
+  useEffect(() => {
+    if (questions !== null) {
+      setRandomIndex()
     }
-  };
+  }, [questions, setRandomIndex]);
 
-  const nextQuestion = () => {
-    if (questionIndex < questions.length - 1) {
-      setQuestionIndex(questionIndex + 1);
-      setShowResult(false);
-    } else {
-      setQuizEnded(true);
+  useEffect(() => {
+    if (questions !== null) {
+      setAlternatives()      
     }
-  };
-
-  const restartQuiz = () => {
-    setQuestionIndex(0);
-    setScore(0);
-    setShowResult(false);
-    setQuizEnded(false);
-  };
+  }, [questions, questionIndex, setAlternatives]);
 
   return (
     <>
@@ -84,17 +139,17 @@ function App() {
       </header>
       <main>
         <section id="question-container">
-          <h2 id="question">{questions && questions[questionIndex].referencia}</h2>
+          <h2 id="question">{questions && questions[questionIndex].palavra_chave}</h2>
           <ul id="options">
-            {questions && questions[questionIndex].opcoes.map((option, index) => (
-                <li key={index}>
-                  <button onClick={() => checkAnswer(index)}>{option}</button>
+            {questions && options.map((option) => (
+                <li key={option[1]}>
+                  <button onClick={() => checkAnswer(option[0])}>{option[0]}</button>
                 </li>
               ))}
           </ul>
         </section>
         <section id="result-container" className={showResult ? '' : 'hidden'}>
-          <p id="result-text">Correct!</p>
+          <p id="result-text">{resultText}</p>
           <button onClick={nextQuestion}>Próxima pergunta</button>
         </section>
         <section id="score-container" className={showResult ? '' : 'hidden'}>
