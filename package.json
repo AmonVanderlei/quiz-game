@@ -10,7 +10,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@rollup/plugin-terser": "^7.0.2",
+    "@jridgewell/sourcemap-codec": "^1.4.8",
+    "workbox-background-sync": "^6.6.0",
+    "svgo": "^2.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
