@@ -6,6 +6,7 @@ function App() {
   const [questions, setQuestions] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState([]);
+  const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
   const [options, setOptions] = useState([["Opção 1", 0], ["Opção 2", 1], ["Opção 3", 2], ["Opção 4", 3]]);
   const [score, setScore] = useState(0);
   const [resultText, setResultText] = useState('');
@@ -70,9 +71,11 @@ function App() {
       let resultText = '';
   
       if (selectedAnswer === currentQuestion.referencia) {
+        setAnsweredCorrectly(1);
         setScore(score + 1);
         resultText = correctMessages[getRandomNumber(correctMessages.length)];
       } else {
+        setAnsweredCorrectly(2);
         resultText = wrongMessages[getRandomNumber(wrongMessages.length)];
       }
   
@@ -86,17 +89,18 @@ function App() {
     }
   };
   
-
   const nextQuestion = () => {
     if (questionsAnswered.length === questions.length) {
       setQuizEnded(true);
     } else {
+      setAnsweredCorrectly(0);
       setQuestionsAnswered([...questionsAnswered, questionIndex]);
       setShowResult(false);
     }
   };
 
   const restartQuiz = () => {
+    setAnsweredCorrectly(0);
     setRandomIndex();
     setQuestionsAnswered([])
     setScore(0);
@@ -105,7 +109,7 @@ function App() {
   };
 
   useEffect(() => {
-    fetch('http://localhost:8000/')
+    fetch('https://quiz-api-amonvanderlei.vercel.app/')
       .then((response) => response.json())
       .then((jsonData) => {
         if (jsonData.livros && jsonData.livros[0] && jsonData.livros[0].novo_testamento) {
@@ -148,12 +152,19 @@ function App() {
               ))}
           </ul>
         </section>
-        <section id="result-container" className={showResult ? '' : 'hidden'}>
-          <p id="result-text">{resultText}</p>
-          <button onClick={nextQuestion}>Próxima pergunta</button>
+        <section id='result-container' className={showResult ? '' : 'hidden'}>
+          <p id="result-text" className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>
+            {resultText}
+            </p>
+          <button id={answeredCorrectly === 1 ? 'green' : answeredCorrectly === 2 ? 'red' : ''} 
+          onClick={nextQuestion}>Próxima pergunta</button>
         </section>
         <section id="score-container" className={showResult ? '' : 'hidden'}>
-          <p>Pontuação: <span id="score">{score}/{questions?.length}</span></p>
+          <p className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>Pontuação:       
+            <span id="score" className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>
+              {score}/{questions?.length}
+            </span>
+          </p>
         </section>
       </main>
       <span id='ended' className={quizEnded ? '' : 'hidden'}>
