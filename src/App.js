@@ -1,179 +1,24 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Menu from './components/Menu';
+import Quiz from './components/Quiz';
+import NoPage from './components/Quiz';
 import './App.css';
-import React, { useEffect, useState, useCallback } from 'react';
+
+/*
+  Salvar as perguntas erradas em um useState e perguntar se quer responder as perguntas novamente
+  Criar componente 404
+*/
 
 function App() {
-  const [name, setName] = useState("Quiz Game")
-  const [questions, setQuestions] = useState(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [questionsAnswered, setQuestionsAnswered] = useState([]);
-  const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
-  const [options, setOptions] = useState([["Opção 1", 0], ["Opção 2", 1], ["Opção 3", 2], ["Opção 4", 3]]);
-  const [score, setScore] = useState(0);
-  const [resultText, setResultText] = useState('');
-  const [showResult, setShowResult] = useState(false);
-  const [quizEnded, setQuizEnded] = useState(false);
-
-  const correctMessages = ["Excelente! Você acertou!",
-  "Muito bem! Resposta correta!",
-  "Isso aí! Você está certo!",
-  "Bom trabalho! Você acertou!",
-  "Você está no caminho certo! Acertou!"]
-  const wrongMessages = ["Oops! Tente novamente.",
-  "Não foi dessa vez. Continue tentando!",
-  "Quase lá! Próxima pergunta!",
-  "Errou, mas não desista!",
-  "Não desanime! Continue tentando."]
-  const endMessages = ["Parabéns! Você é um mestre do conhecimento.",
-  "Quiz concluído! Você é realmente um especialista.",
-  "Incrível! Você venceu o desafio.",
-  "Parabéns! Quiz completo.",
-  "Quiz encerrado! Você arrasou nas respostas.",
-  "O verdadeiro campeão é aquele que não desiste!",
-  "Missão cumprida! Todas as perguntas respondidas."]
-
-  function getRandomNumber(n) {
-    return Math.floor(Math.random() * n);
-  }
-
-  const setRandomIndex = useCallback(() => {
-    let random = getRandomNumber(questions.length)
-    while (questionsAnswered.includes(random)) {
-      random = getRandomNumber(questions.length)
-    }
-    setQuestionIndex(random);
-  }, [questions, questionsAnswered]);
-
-  const setAlternatives = useCallback(() => {
-    let newQuestions = [-1, -1, -1, -1];
-    let addedQuestions = [questionIndex]
-    let availableIndexes = [true, true, true, true]
-
-    let i = getRandomNumber(4)
-    newQuestions[i] = [questions[questionIndex].referencia, i]
-    availableIndexes[i] = false
-
-    for (let j = 0; j < availableIndexes.length; j++) {
-      if (availableIndexes[j]) {
-        let randomIndex = getRandomNumber(questions.length)
-        while (addedQuestions.includes(randomIndex)) {
-          randomIndex = getRandomNumber(questions.length);
-        }
-        newQuestions[j] = [questions[randomIndex].referencia, j]
-        availableIndexes[j] = false
-      }
-    }
-    setOptions(newQuestions);
-  }, [questions, questionIndex]);
-
-  const checkAnswer = (selectedAnswer) => {
-    if (!showResult) {
-      const currentQuestion = questions[questionIndex];
-      let resultText = '';
-  
-      if (selectedAnswer === currentQuestion.referencia) {
-        setAnsweredCorrectly(1);
-        setScore(score + 1);
-        resultText = correctMessages[getRandomNumber(correctMessages.length)];
-      } else {
-        setAnsweredCorrectly(2);
-        resultText = wrongMessages[getRandomNumber(wrongMessages.length)];
-      }
-  
-      if ((questionsAnswered.length + 1) === questions.length) {
-        setQuizEnded(true);
-      } else {
-        setShowResult(true);
-      }
-  
-      setResultText(resultText);
-    }
-  };
-  
-  const nextQuestion = () => {
-    if (questionsAnswered.length === questions.length) {
-      setQuizEnded(true);
-    } else {
-      setAnsweredCorrectly(0);
-      setQuestionsAnswered([...questionsAnswered, questionIndex]);
-      setShowResult(false);
-    }
-  };
-
-  const restartQuiz = () => {
-    setAnsweredCorrectly(0);
-    setRandomIndex();
-    setQuestionsAnswered([])
-    setScore(0);
-    setShowResult(false);
-    setQuizEnded(false);
-  };
-
-  useEffect(() => {
-    fetch('https://quiz-api-amonvanderlei.vercel.app/')
-      .then((response) => response.json())
-      .then((jsonData) => {
-        if (jsonData.livros && jsonData.livros[0] && jsonData.livros[0].novo_testamento) {
-          setName(jsonData.livros[0].nome);
-          setQuestions(jsonData.livros[0].novo_testamento);
-        } else {
-          console.error('A estrutura dos dados está incorreta');
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao carregar o JSON:', error);
-      });
-  }, []);
-  
-  useEffect(() => {
-    if (questions !== null) {
-      setRandomIndex()
-    }
-  }, [questions, setRandomIndex]);
-
-  useEffect(() => {
-    if (questions !== null) {
-      setAlternatives()      
-    }
-  }, [questions, questionIndex, setAlternatives]);
-
   return (
-    <>
-      <header>
-        <h1>Quiz - {name}</h1>
-      </header>
-      <main>
-        <section id="question-container">
-          <h2 id="question">{questions && questions[questionIndex].palavra_chave}</h2>
-          <ul id="options">
-            {questions && options.map((option) => (
-                <li key={option[1]}>
-                  <button onClick={() => checkAnswer(option[0])}>{option[0]}</button>
-                </li>
-              ))}
-          </ul>
-        </section>
-        <section id='result-container' className={showResult ? '' : 'hidden'}>
-          <p id="result-text" className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>
-            {resultText}
-            </p>
-          <button id={answeredCorrectly === 1 ? 'green' : answeredCorrectly === 2 ? 'red' : ''} 
-          onClick={nextQuestion}>Próxima pergunta</button>
-        </section>
-        <section id="score-container" className={showResult ? '' : 'hidden'}>
-          <p className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>Pontuação:       
-            <span id="score" className={answeredCorrectly === 1 ? 'green-text' : answeredCorrectly === 2 ? 'red-text' : ''}>
-              {score}/{questions?.length}
-            </span>
-          </p>
-        </section>
-      </main>
-      <span id='ended' className={quizEnded ? '' : 'hidden'}>
-        <h2><b>Quiz Concluído!</b></h2>
-        <p><b>{endMessages[getRandomNumber(endMessages.length)]}</b></p>
-        <p>Pontuação: <b>{score} / {questions?.length}</b></p>
-        <button onClick={restartQuiz}>Reiniciar</button>
-      </span>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Menu />} />
+        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/*" element={<NoPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -1,3 +1,5 @@
+/* General Style */
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -19,12 +21,86 @@ header h1 {
 main {
   width: 80%;
   max-width: 800px;
-  margin: 5% auto 0 auto;
+  margin: 5% auto;
   padding: 20px;
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
+
+button {
+  display: block;
+  width: 100%;
+  height: 3rem;
+  padding: 10px;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #005bb5;
+}
+
+/* Menu Style */
+
+main h2 {
+  text-align: center;
+  margin: 0 0 1.5rem;
+  font-size: 2rem;
+  color: #005bb5;
+}
+
+#menu-form {
+  display: flex;
+  flex-direction: column;
+  color: #007acc;
+}
+
+#menu-form input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0 5px 0 0;
+
+  font: inherit;
+  color: #000;
+  width: 1em;
+  height: 1em;
+  border: 0.14em solid #003c79;
+  border-radius: 0.05em;
+  transform: translateY(20%);
+
+  transition: border-radius 0.3s ease, background-color 0.3s ease;
+}
+
+#menu-form input[type="checkbox"]:checked {
+  border-radius: 50%;
+  background: #0099ff;
+}
+
+#choose-scriptures {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+}
+
+#choose-scriptures div {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 2rem;
+  font-size: 1.25rem;
+}
+
+#scriptures {
+  margin-bottom: 5px;
+}
+
+/* Quiz Style */
 
 #question-container {
   margin-bottom: 20px;
@@ -44,24 +120,6 @@ main {
 
 #options li {
   margin-bottom: 10px;
-}
-
-button {
-  display: block;
-  width: 100%;
-  height: 3rem;
-  padding: 10px;
-  background-color: #007acc;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
-button:hover {
-  background-color: #005bb5;
 }
 
 #green {
@@ -92,8 +150,8 @@ button:hover {
   text-align: center;
 }
 
-#result-container.hidden, #score-container.hidden, #ended.hidden{
-  display: none;
+.hidden{
+  display: none!important;
 }
 
 #score-container p {
@@ -116,13 +174,10 @@ button:hover {
 }
 
 #ended {
-  position: absolute;
   width: 85%;
   height: 75%;
-  margin: auto;
+  margin: 2rem auto 0;
   padding: 10px 25px;
-  top: 13%;
-  left: 5%;
   border-radius: 25px;
   display: flex;
   flex-direction: column;
