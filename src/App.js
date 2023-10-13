@@ -2,13 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Menu from './components/Menu';
 import Quiz from './components/Quiz';
-import NoPage from './components/Quiz';
+import NoPage from './components/404';
 import './App.css';
-
-/*
-  Salvar as perguntas erradas em um useState e perguntar se quer responder as perguntas novamente
-  Criar componente 404
-*/
 
 function App() {
   return (

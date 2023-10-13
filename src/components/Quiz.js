@@ -7,6 +7,7 @@ function Quiz() {
   const [questions, setQuestions] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState([]);
+  const [wrongAnsweredQuestions, setWrongAnsweredQuestions] = useState([]);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
   const [options, setOptions] = useState([["Opção 1", 0], ["Opção 2", 1], ["Opção 3", 2], ["Opção 4", 3]]);
   const [score, setScore] = useState(0);
@@ -78,6 +79,11 @@ function Quiz() {
         setScore(score + 1);
         resultText = correctMessages[getRandomNumber(correctMessages.length)];
       } else {
+        setWrongAnsweredQuestions(prevQuestions => [
+          ...prevQuestions,
+          questionIndex
+        ]);
+
         setAnsweredCorrectly(2);
         resultText = wrongMessages[getRandomNumber(wrongMessages.length)];
       }
@@ -102,13 +108,28 @@ function Quiz() {
     }
   };
 
-  const restartQuiz = () => {
+  const wrongQuiz = () => {
+    console.log(wrongAnsweredQuestions.length);
+    let newQuestions = []
+    for (const i of wrongAnsweredQuestions){
+      newQuestions.push(questions[i]);
+    };
+    console.log(questions)
+    console.log(newQuestions)
+
+    setQuestions(newQuestions);
     setAnsweredCorrectly(0);
+    setWrongAnsweredQuestions([]);
+    setQuestionIndex(0);
     setRandomIndex();
-    setQuestionsAnswered([])
+    setQuestionsAnswered([]);
     setScore(0);
     setShowResult(false);
     setQuizEnded(false);
+  };
+
+  const restartQuiz = () => {
+    navigate('/')
   };
 
   useEffect(() => {
@@ -141,7 +162,7 @@ function Quiz() {
       </header>
       <main className={quizEnded ? 'hidden' : ''}>
         <section id="question-container">
-          <h2 id="question">{questions && questions[questionIndex].palavra_chave}</h2>
+          <h2 id="question">{questions && questions[questionIndex]?.palavra_chave}</h2>
           <ul id="options">
             {questions && options.map((option) => (
                 <li key={option[1]}>
@@ -169,6 +190,7 @@ function Quiz() {
         <h2><b>Quiz Concluído!</b></h2>
         <p><b>{endMessages[getRandomNumber(endMessages.length)]}</b></p>
         <p>Pontuação: <b>{score} / {questions?.length}</b></p>
+        <button className={wrongAnsweredQuestions.length === 0 ? 'hidden' : ''} onClick={wrongQuiz}>Refazer questões erradas</button>
         <button onClick={restartQuiz}>Reiniciar</button>
       </span>
     </>
