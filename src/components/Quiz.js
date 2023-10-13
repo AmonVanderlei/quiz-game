@@ -50,7 +50,7 @@ function Quiz() {
     let availableIndexes = [true, true, true, true]
 
     let i = getRandomNumber(4)
-    options[i] = [questions[questionIndex].referencia, i]
+    options[i] = [questions[questionIndex]?.referencia, i]
     availableIndexes[i] = false
 
     for (let j = 0; j < availableIndexes.length; j++) {
@@ -109,13 +109,10 @@ function Quiz() {
   };
 
   const wrongQuiz = () => {
-    console.log(wrongAnsweredQuestions.length);
     let newQuestions = []
     for (const i of wrongAnsweredQuestions){
       newQuestions.push(questions[i]);
     };
-    console.log(questions)
-    console.log(newQuestions)
 
     setQuestions(newQuestions);
     setAnsweredCorrectly(0);
